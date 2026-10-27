@@ -1,0 +1,33 @@
+MODULE TurboTransOriginal
+library 'lattice';
+
+CLK,EIN,PHI2,WE,A11,A12,A13,A14,A15,!OE		pin	1..9,11;
+CAS1,CAS2                               	pin 	12,19			istype 'com' ;
+CCKEN,CCTRL,RCTRL,CCLR,EPA14,EPCE	 	pin 	13,14,15,16,17,18	istype 'reg' ;
+	
+out=[CCKEN,CCTRL,RCTRL,CCLR,EPA14,EPCE];
+
+equations
+
+out.clk=CLK;
+
+!CAS1 = A11 & !A12 & A13 & A14 & !A15 & !CCTRL & PHI2;	"CAS1 wenn Rambank 1 adressiert, ClockControl 0 ist und Phi2(ist verzögert) anliegt. 
+!CAS2 = !A11 & A12 & A13 & A14 & !A15 & !CCTRL & PHI2;	"CAS2 wenn Rambank 2 adressiert, ClockControl 0 ist und Phi2(ist verzögert) anliegt.
+
+
+!EPCE := WE & !RCTRL & A15    # WE & RCTRL & A14 & A15    # WE & RCTRL & !A13 & !A14 & A15;
+
+!EPA14 := !EIN # EIN & !A13 & A14 # EIN & !RCTRL & !A13 & !A14;
+
+!CCLR := !WE & A11 & !A12 & !A13 & A14 & !A15;
+
+!RCTRL := !WE & A11 & !A12 & !A13 & !A14 & !A15    # !RCTRL & A14    # !RCTRL & A13    # !A12 & !RCTRL    # A11 & !RCTRL    # !RCTRL & A15    # WE & !RCTRL;
+
+!CCTRL := !WE & A11 & !A12 & A13 & !A14 & !A15    # !CCTRL & A14    # !A13 & !CCTRL    # !A12 & !CCTRL    # A11 & !CCTRL    # !CCTRL & A15    # WE & !CCTRL;
+
+!CCKEN := CCTRL    # !WE & !A11 & A12 & !A13 & !CCTRL & A14 & CCKEN & !A15;
+
+
+
+END 
+
